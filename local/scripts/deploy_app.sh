@@ -12,7 +12,6 @@ add-apt-repository \
    stable"
 apt-get update
 apt-get install -y docker-ce
-service docker start
 FILE="/etc/docker/daemon.json"
 /bin/cat <<EOM >$FILE
 {
@@ -21,7 +20,7 @@ FILE="/etc/docker/daemon.json"
 }
 EOM
 sudo service docker restart
-curl -L https://github.com/docker/compose/releases/download/1.13.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 cd ..
 sudo chmod 777 ./grafana/setup.sh

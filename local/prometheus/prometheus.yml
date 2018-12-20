@@ -42,9 +42,3 @@ scrape_configs:
          # scheme defaults to 'http'.
     static_configs:
       - targets: ['localhost:9323']
-
-remote_write:
-  - url: "http://localhost:8086/api/v1/prom/write?db=prometheus&u=username&p=password"
-
-remote_read:
-  - url: "http://localhost:8086/api/v1/prom/read?db=prometheus&u=username&p=password"
