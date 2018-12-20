@@ -14,10 +14,13 @@ apt-get install -y docker-ce
 FILE="/etc/docker/daemon.json"
 /bin/cat <<EOM >$FILE
 {
-  "metrics-addr" : "127.0.0.1:9323",
+  "metrics-addr" : "0.0.0.0:9323",
   "experimental" : true
 }
 EOM
+myip="$(dig +short myip.opendns.com @resolver1.opendns.com)"
+echo "My Public IP address: ${myip}"
+sed -i "s/SERVER_PUBLIC_IP_ADDRESS/$myip/g" ../prometheus/prometheus.yml
 sudo service docker restart
 curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
