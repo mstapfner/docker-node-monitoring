@@ -1,0 +1,81 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: "prometheus"
+    ports:
+      - "9090:9090"
+      - "9323:9323"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitor-net
+    labels:
+      org.label-schema.group: "monitoring"
+  grafana:
+    user: root
+    image: grafana/grafana
+    container_name: "grafana"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/datasources:/etc/grafana/datasources
+      - ./grafana/dashboards:/etc/grafana/dashboards
+      - ./grafana/setup.sh:/setup.sh
+    entrypoint: /setup.sh
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    links:
+      - prometheus
+    depends_on:
+      - prometheus
+    networks:
+      - monitor-net
+    labels:
+      org.label-schema.group: "monitoring"
+  nodeexporter:
+    image: prom/node-exporter
+    container_name: nodeexporter
+    user: root
+    privileged: true
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "9100:9100"
+    networks:
+      - monitor-net
+    labels:
+      org.label-schema.group: "monitoring"
+  cadvisor:
+    image: google/cadvisor
+    container_name: cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      #- /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
+    ports:
+      - "8080:8080"
+    networks:
+      - monitor-net
+    labels:
+      org.label-schema.group: "monitoring"
+  pushgateway:
+    image: prom/pushgateway
+    container_name: pushgateway
+    restart: unless-stopped
+    ports:
+      - "9091:9091"
+    networks:
+      - monitor-net
+    labels:
+      org.label-schema.group: "monitoring"
