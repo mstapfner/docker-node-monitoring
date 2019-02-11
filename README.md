@@ -2,7 +2,7 @@
 
 In the start script of VM to monitor (replace publicIpTool with the remote server public IP address): 
 
-
+```
 #!/bin/bash
 apt-get install -y \
     apt-transport-https \
@@ -27,3 +27,4 @@ remote_read:
 EOT
 cd docker-node-monitoring/local/scripts
 sh ./deploy_app.sh
+```
