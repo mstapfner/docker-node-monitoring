@@ -59,7 +59,6 @@ services:
   cadvisor:
     image: google/cadvisor
     container_name: cadvisor
-    privileged: true
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
